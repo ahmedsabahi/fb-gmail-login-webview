@@ -56,7 +56,7 @@ class _PrinterState extends State<Printer> {
     try {
       devices = await bluetooth.getBondedDevices();
     } on PlatformException {
-      print("Error");
+      print('---------initPlatformState Error-------------');
     }
 
     bluetooth.onStateChanged().listen((state) {

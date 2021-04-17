@@ -28,17 +28,23 @@ class _FacebookSignInButtonState extends State<FacebookSignInButton> {
                 ),
               ),
               onPressed: () async {
-                final LoginResult result = await FacebookAuth.instance.login();
-                final userData = await FacebookAuth.instance.getUserData();
+                final LoginResult result = await FacebookAuth.instance
+                    .login(); // by the fault we request the email and the public profile
 
                 if (result.status == LoginStatus.success) {
+                  final accessToken = result.accessToken;
+                  final userData = await FacebookAuth.instance.getUserData();
                   print("you are logged$userData");
+                  print("you access Token$accessToken");
                   Navigator.of(context).pushReplacement(
                     MaterialPageRoute(
                       builder: (context) =>
                           UserInfoScreenFb(userData: userData),
                     ),
                   );
+                } else {
+                  print(result.status);
+                  print(result.message);
                 }
               },
               child: Padding(
