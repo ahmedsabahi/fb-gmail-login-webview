@@ -1,7 +1,5 @@
-import 'dart:ffi';
 import 'dart:io';
 import 'dart:typed_data';
-import 'package:easacc_task/widgets/printer.dart';
 import 'package:easacc_task/widgets/testprint.dart';
 import 'package:flutter/material.dart';
 import 'package:screenshot/screenshot.dart';
@@ -65,12 +63,7 @@ class WebViewExampleState extends State<WebViewExample> {
                   screenshotController.capture().then((Uint8List image) async {
                     _imageFile = image;
                     print('Successful Screenshot => $_imageFile');
-
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                testPrint.sample(_imageFile)));
+                    testPrint.sample(_imageFile);
                   }).catchError((onError) {
                     print('-----Error------$onError');
                   });
@@ -83,9 +76,12 @@ class WebViewExampleState extends State<WebViewExample> {
             ),
           ],
         ),
-        body: WebView(
-          initialUrl: widget.url,
-          javascriptMode: JavascriptMode.unrestricted,
+        body: Screenshot(
+          controller: screenshotController,
+          child: WebView(
+            initialUrl: widget.url,
+            javascriptMode: JavascriptMode.unrestricted,
+          ),
         ),
       ),
     );

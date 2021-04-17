@@ -5,7 +5,7 @@ class TestPrint {
   BlueThermalPrinter bluetooth = BlueThermalPrinter.instance;
 
   sample(Uint8List pathImage) async {
-    print(pathImage);
+    print('------hello from test Print---------$pathImage');
     //SIZE
     // 0- normal size text
     // 1- only bold text
