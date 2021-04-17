@@ -1,4 +1,5 @@
 import 'package:easacc_task/screens/user_info_screen_fb.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 
@@ -9,6 +10,20 @@ class FacebookSignInButton extends StatefulWidget {
 
 class _FacebookSignInButtonState extends State<FacebookSignInButton> {
   bool _isSigningIn = false;
+
+  Future<UserCredential> signInWithFacebook() async {
+    final LoginResult result = await FacebookAuth.instance.login();
+    if (result.status == LoginStatus.success) {
+      // Create a credential from the access token
+      final OAuthCredential credential =
+          FacebookAuthProvider.credential(result.accessToken.token);
+      // Once signed in, return the UserCredential
+      return await FirebaseAuth.instance.signInWithCredential(credential);
+    } else {
+      print(result.status);
+      print(result.message);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,24 +43,14 @@ class _FacebookSignInButtonState extends State<FacebookSignInButton> {
                 ),
               ),
               onPressed: () async {
-                final LoginResult result = await FacebookAuth.instance
-                    .login(); // by the fault we request the email and the public profile
-
-                if (result.status == LoginStatus.success) {
-                  final accessToken = result.accessToken;
-                  final userData = await FacebookAuth.instance.getUserData();
-                  print("you are logged$userData");
-                  print("you access Token$accessToken");
-                  Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          UserInfoScreenFb(userData: userData),
-                    ),
-                  );
-                } else {
-                  print(result.status);
-                  print(result.message);
-                }
+                signInWithFacebook();
+                final userData = await FacebookAuth.instance.getUserData();
+                print("you are logged$userData");
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(
+                    builder: (context) => UserInfoScreenFb(userData: userData),
+                  ),
+                );
               },
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
