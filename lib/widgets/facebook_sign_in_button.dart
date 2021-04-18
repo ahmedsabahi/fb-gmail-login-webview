@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:easacc_task/screens/user_info_screen_fb.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -11,18 +13,76 @@ class FacebookSignInButton extends StatefulWidget {
 class _FacebookSignInButtonState extends State<FacebookSignInButton> {
   bool _isSigningIn = false;
 
+  Map<String, dynamic> _userData;
+  AccessToken _accessToken;
+  bool _checking = true;
+
   Future<UserCredential> signInWithFacebook() async {
     final LoginResult result = await FacebookAuth.instance.login();
     if (result.status == LoginStatus.success) {
-      // Create a credential from the access token
       final OAuthCredential credential =
           FacebookAuthProvider.credential(result.accessToken.token);
-      // Once signed in, return the UserCredential
       return await FirebaseAuth.instance.signInWithCredential(credential);
     } else {
       print(result.status);
       print(result.message);
     }
+    return null;
+  }
+
+  Future<void> _checkIfIsLogged() async {
+    final accessToken = await FacebookAuth.instance.accessToken;
+    setState(() {
+      _checking = false;
+    });
+    if (accessToken != null) {
+      print("is Logged:::: ${prettyPrint(accessToken.toJson())}");
+      final userData = await FacebookAuth.instance.getUserData();
+      _accessToken = accessToken;
+      setState(() {
+        _userData = userData;
+      });
+    }
+  }
+
+  Future<void> _login() async {
+    final LoginResult result = await FacebookAuth.instance
+        .login(); // by the fault we request the email and the public profile
+
+    if (result.status == LoginStatus.success) {
+      _accessToken = result.accessToken;
+      _printCredentials();
+      // get the user data
+      // by default we get the userId, email,name and picture
+      final userData = await FacebookAuth.instance.getUserData();
+      // final userData = await FacebookAuth.instance.getUserData(fields: "email,birthday,friends,gender,link");
+      _userData = userData;
+    } else {
+      print(result.status);
+      print(result.message);
+    }
+
+    setState(() {
+      _checking = false;
+    });
+  }
+
+  void _printCredentials() {
+    print(
+      prettyPrint(_accessToken.toJson()),
+    );
+  }
+
+  String prettyPrint(Map json) {
+    JsonEncoder encoder = new JsonEncoder.withIndent('  ');
+    String pretty = encoder.convert(json);
+    return pretty;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _checkIfIsLogged();
   }
 
   @override
@@ -43,12 +103,30 @@ class _FacebookSignInButtonState extends State<FacebookSignInButton> {
                 ),
               ),
               onPressed: () async {
-                signInWithFacebook();
+                setState(() {
+                  _isSigningIn = true;
+                });
+                final LoginResult result = await FacebookAuth.instance.login();
+                if (result.status == LoginStatus.success) {
+                  _accessToken = result.accessToken;
+
+                  final OAuthCredential credential =
+                      FacebookAuthProvider.credential(result.accessToken.token);
+                  await FirebaseAuth.instance.signInWithCredential(credential);
+                } else {
+                  print(result.status);
+                  print(result.message);
+                }
                 final userData = await FacebookAuth.instance.getUserData();
+
+                setState(() {
+                  _isSigningIn = false;
+                });
+
                 print("you are logged$userData");
                 Navigator.of(context).pushReplacement(
                   MaterialPageRoute(
-                    builder: (context) => UserInfoScreenFb(userData: userData),
+                    builder: (context) => UserInfoScreenFb(userData: _userData),
                   ),
                 );
               },

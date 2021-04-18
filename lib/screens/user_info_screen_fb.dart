@@ -1,5 +1,6 @@
 import 'package:easacc_task/screens/webview_screen.dart';
-import 'package:easacc_task/widgets/printer.dart';
+import 'package:easacc_task/widgets/bluetooth.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:easacc_task/screens/sign_in_screen.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
@@ -17,13 +18,6 @@ class _UserInfoScreenFbState extends State<UserInfoScreenFb> {
   bool _isSigningOut = false;
 
   TextEditingController textController = new TextEditingController();
-
-  @override
-  void dispose() {
-    // Clean up the controller when the widget is disposed.
-    textController.dispose();
-    super.dispose();
-  }
 
   Route _routeToSignInScreen() {
     return PageRouteBuilder(
@@ -44,18 +38,21 @@ class _UserInfoScreenFbState extends State<UserInfoScreenFb> {
     );
   }
 
+  Future<void> _logOut() async {
+    await FacebookAuth.instance.logOut();
+    await FirebaseAuth.instance.signOut();
+  }
+
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is disposed.
+    textController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.refresh),
-            tooltip: 'Refresh',
-            onPressed: () {},
-          ),
-        ],
-      ),
       backgroundColor: Color(0xFF2C384A),
       body: Center(
         child: SingleChildScrollView(
@@ -108,7 +105,7 @@ class _UserInfoScreenFbState extends State<UserInfoScreenFb> {
                             setState(() {
                               _isSigningOut = true;
                             });
-                            await FacebookAuth.instance.logOut();
+                            await _logOut();
                             setState(() {
                               _isSigningOut = false;
                             });
@@ -153,7 +150,7 @@ class _UserInfoScreenFbState extends State<UserInfoScreenFb> {
                             Navigator.of(context).push(
                               MaterialPageRoute(
                                 builder: (context) =>
-                                    WebViewExample(url: textController.text),
+                                    WebViewScreen(url: textController.text),
                               ),
                             );
                           },
@@ -167,7 +164,7 @@ class _UserInfoScreenFbState extends State<UserInfoScreenFb> {
                     onPressed: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (context) => Printer(),
+                          builder: (context) => BluetoothScreen(),
                         ),
                       );
                     },

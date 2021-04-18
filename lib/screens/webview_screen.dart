@@ -1,43 +1,56 @@
 import 'dart:io';
 import 'dart:typed_data';
-import 'package:easacc_task/widgets/testprint.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_blue/gen/flutterblue.pbjson.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
+import 'package:flutter_blue/flutter_blue.dart';
 
-class WebViewExample extends StatefulWidget {
+class WebViewScreen extends StatefulWidget {
   final String url;
 
-  WebViewExample({Key key, @required this.url}) : super(key: key);
+  WebViewScreen({Key key, @required this.url}) : super(key: key);
 
   @override
-  WebViewExampleState createState() => WebViewExampleState();
+  WebViewScreenState createState() => WebViewScreenState();
 }
 
-class WebViewExampleState extends State<WebViewExample> {
+class WebViewScreenState extends State<WebViewScreen> {
   int _counter = 0;
   Uint8List _imageFile;
-  TestPrint testPrint;
+  // TestPrint testPrint;
 
   ScreenshotController screenshotController = ScreenshotController();
 
   @override
   void initState() {
-    WidgetsBinding.instance.addPostFrameCallback(_afterLayout);
-
-    super.initState();
     // Enable hybrid composition.
     if (Platform.isAndroid) WebView.platform = SurfaceAndroidWebView();
-  }
-
-  _afterLayout(_) {
-    testPrint = TestPrint();
+    super.initState();
   }
 
   void _incrementCounter() {
     setState(() {
       _counter++;
     });
+  }
+
+  Future<Uint8List> _generatePdf(PdfPageFormat format, imageFile) async {
+    final image = pw.MemoryImage(imageFile);
+    final pdf = pw.Document();
+    print('-------------------------$image');
+    print('-------------------------$imageFile');
+
+    pdf.addPage(pw.Page(build: (pw.Context context) {
+      return pw.Center(
+        child: pw.Image(image),
+      ); // Center
+    }));
+
+    return pdf.save();
   }
 
   @override
@@ -56,14 +69,16 @@ class WebViewExampleState extends State<WebViewExample> {
           actions: <Widget>[
             Padding(
               padding: EdgeInsets.only(right: 20.0),
-              child: GestureDetector(
-                onTap: () {
+              child: ElevatedButton(
+                onPressed: () async {
                   _incrementCounter();
                   _imageFile = null;
-                  screenshotController.capture().then((Uint8List image) async {
-                    _imageFile = image;
-                    print('Successful Screenshot => $_imageFile');
-                    testPrint.sample(_imageFile);
+                  screenshotController.capture().then((image) async {
+                    print('Successful Screenshot => $image');
+
+                    PdfPreview(
+                      build: (format) => _generatePdf(format, image),
+                    );
                   }).catchError((onError) {
                     print('-----Error------$onError');
                   });

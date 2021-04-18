@@ -1,5 +1,5 @@
 import 'package:easacc_task/screens/webview_screen.dart';
-import 'package:easacc_task/widgets/printer.dart';
+import 'package:easacc_task/widgets/bluetooth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:easacc_task/screens/sign_in_screen.dart';
@@ -57,15 +57,6 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.refresh),
-            tooltip: 'Refresh',
-            onPressed: () {},
-          ),
-        ],
-      ),
       backgroundColor: Color(0xFF2C384A),
       body: Center(
         child: SingleChildScrollView(
@@ -119,6 +110,7 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                               _isSigningOut = true;
                             });
                             await Authentication.signOut(context: context);
+
                             setState(() {
                               _isSigningOut = false;
                             });
@@ -164,7 +156,7 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                               Navigator.of(context).push(
                                 MaterialPageRoute(
                                   builder: (context) =>
-                                      WebViewExample(url: textController.text),
+                                      WebViewScreen(url: textController.text),
                                 ),
                               );
                             },
@@ -179,7 +171,7 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                     onPressed: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (context) => Printer(),
+                          builder: (context) => BluetoothScreen(),
                         ),
                       );
                     },
