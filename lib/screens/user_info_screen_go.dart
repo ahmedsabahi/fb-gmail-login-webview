@@ -1,4 +1,5 @@
 import 'package:easacc_task/screens/webview_screen.dart';
+import 'package:easacc_task/utils/printer.dart';
 import 'package:easacc_task/widgets/bluetooth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -166,16 +167,16 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                     ],
                   ),
                   SizedBox(height: 60.0),
-                  ElevatedButton(
-                    child: Text("Devices on your Local Network"),
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => BluetoothScreen(),
-                        ),
-                      );
-                    },
-                  ),
+                  // ElevatedButton(
+                  //   child: Text("Devices on your Local Network"),
+                  //   onPressed: () {
+                  //     Navigator.of(context).push(
+                  //       MaterialPageRoute(
+                  //         builder: (context) => Print(data),
+                  //       ),
+                  //     );
+                  //   },
+                  // ),
                   SizedBox(height: 20.0),
                 ],
               ),

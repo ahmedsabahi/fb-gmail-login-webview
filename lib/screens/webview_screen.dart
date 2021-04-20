@@ -1,13 +1,16 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:easacc_task/utils/printer.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_blue/gen/flutterblue.pbjson.dart';
+import 'package:flutter/rendering.dart';
+// import 'package:flutter_blue/gen/flutterblue.pbjson.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import 'package:pdf/pdf.dart';
-import 'package:pdf/widgets.dart' as pw;
-import 'package:printing/printing.dart';
-import 'package:flutter_blue/flutter_blue.dart';
+// import 'package:pdf/pdf.dart';
+// import 'package:pdf/widgets.dart' as pw;
+// import 'package:printing/printing.dart';
+// import 'package:flutter_blue/flutter_blue.dart';
+import 'dart:ui' as ui;
 
 class WebViewScreen extends StatefulWidget {
   final String url;
@@ -20,10 +23,25 @@ class WebViewScreen extends StatefulWidget {
 
 class WebViewScreenState extends State<WebViewScreen> {
   int _counter = 0;
-  Uint8List _imageFile;
-  // TestPrint testPrint;
+
+  // Example Data to test printer
+  final List<Map<String, dynamic>> data = [
+    {
+      'title': 'item 1',
+      'price': 100,
+      'qty': 2,
+      'total_price': 200,
+    },
+    {
+      'title': 'item 2',
+      'price': 2000,
+      'qty': 2,
+      'total_price': 4000,
+    },
+  ];
 
   ScreenshotController screenshotController = ScreenshotController();
+  GlobalKey _containerKey = GlobalKey();
 
   @override
   void initState() {
@@ -32,71 +50,49 @@ class WebViewScreenState extends State<WebViewScreen> {
     super.initState();
   }
 
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
-  Future<Uint8List> _generatePdf(PdfPageFormat format, imageFile) async {
-    final image = pw.MemoryImage(imageFile);
-    final pdf = pw.Document();
-    print('-------------------------$image');
-    print('-------------------------$imageFile');
-
-    pdf.addPage(pw.Page(build: (pw.Context context) {
-      return pw.Center(
-        child: pw.Image(image),
-      ); // Center
-    }));
-
-    return pdf.save();
-  }
-
   @override
   Widget build(BuildContext context) {
-    print(widget.url);
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text('welcome '),
-          backgroundColor: Color(0xFF2C384A),
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-          actions: <Widget>[
-            Padding(
-              padding: EdgeInsets.only(right: 20.0),
-              child: ElevatedButton(
-                onPressed: () async {
-                  _incrementCounter();
-                  _imageFile = null;
-                  screenshotController.capture().then((image) async {
-                    print('Successful Screenshot => $image');
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('${widget.url}'),
+        backgroundColor: Color(0xFF2C384A),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        actions: <Widget>[
+          Padding(
+            padding: EdgeInsets.only(right: 20.0),
+            child: ElevatedButton(
+              onPressed: () async {
+                RenderRepaintBoundary renderRepaintBoundary =
+                    _containerKey.currentContext.findRenderObject();
+                ui.Image boxImage =
+                    await renderRepaintBoundary.toImage(pixelRatio: 1);
+                ByteData byteData =
+                    await boxImage.toByteData(format: ui.ImageByteFormat.png);
+                Uint8List uInt8List = byteData.buffer.asUint8List();
 
-                    PdfPreview(
-                      build: (format) => _generatePdf(format, image),
-                    );
-                  }).catchError((onError) {
-                    print('-----Error------$onError');
-                  });
-                },
-                child: Icon(
-                  Icons.local_printshop_rounded,
-                  size: 26.0,
-                ),
+                print(uInt8List);
+
+                Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => Print(data, uInt8List),
+                ));
+              },
+              child: Icon(
+                Icons.local_printshop_rounded,
+                size: 26.0,
               ),
             ),
-          ],
-        ),
-        body: Screenshot(
-          controller: screenshotController,
-          child: WebView(
-            initialUrl: widget.url,
-            javascriptMode: JavascriptMode.unrestricted,
           ),
+        ],
+      ),
+      body: RepaintBoundary(
+        key: _containerKey,
+        child: WebView(
+          allowsInlineMediaPlayback: true,
+          initialUrl: widget.url,
+          javascriptMode: JavascriptMode.unrestricted,
         ),
       ),
     );

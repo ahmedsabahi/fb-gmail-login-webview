@@ -159,16 +159,16 @@ class _UserInfoScreenFbState extends State<UserInfoScreenFb> {
                     ],
                   ),
                   SizedBox(height: 60.0),
-                  ElevatedButton(
-                    child: Text("Devices on your Local Network"),
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => BluetoothScreen(),
-                        ),
-                      );
-                    },
-                  ),
+                  // ElevatedButton(
+                  //   child: Text("Devices on your Local Network"),
+                  //   onPressed: () {
+                  //     Navigator.of(context).push(
+                  //       MaterialPageRoute(
+                  //         builder: (context) => BluetoothScreen(),
+                  //       ),
+                  //     );
+                  //   },
+                  // ),
                   SizedBox(height: 20.0),
                 ],
               ),
