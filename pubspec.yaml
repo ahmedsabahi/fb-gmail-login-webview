@@ -19,14 +19,10 @@ dependencies:
   flutter_facebook_auth: ^3.3.2+2
   webview_flutter: ^2.0.4
   http: ^0.13.1
-  path_provider: ^2.0.1
-  screenshot: ^0.3.0
-#  printing: ^5.1.0
-#  flutter_blue: ^0.8.0
-#  pdf: ^3.2.0
   esc_pos_bluetooth: ^0.2.8
   flutter_bluetooth_basic: ^0.1.5
-  image: ^2.1.4
+#  esc_pos_utils: ^0.3.6
+  bluetooth_thermal_printer: ^0.0.4
 
 
 dev_dependencies:

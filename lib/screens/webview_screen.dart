@@ -1,16 +1,8 @@
 import 'dart:io';
-import 'dart:typed_data';
-import 'package:easacc_task/utils/printer.dart';
+import 'package:easacc_task/screens/printer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-// import 'package:flutter_blue/gen/flutterblue.pbjson.dart';
-import 'package:screenshot/screenshot.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-// import 'package:pdf/pdf.dart';
-// import 'package:pdf/widgets.dart' as pw;
-// import 'package:printing/printing.dart';
-// import 'package:flutter_blue/flutter_blue.dart';
-import 'dart:ui' as ui;
 
 class WebViewScreen extends StatefulWidget {
   final String url;
@@ -22,26 +14,25 @@ class WebViewScreen extends StatefulWidget {
 }
 
 class WebViewScreenState extends State<WebViewScreen> {
-  int _counter = 0;
+  // Reference to webview controller
+  WebViewController _controller;
+  String _html;
 
-  // Example Data to test printer
-  final List<Map<String, dynamic>> data = [
-    {
-      'title': 'item 1',
-      'price': 100,
-      'qty': 2,
-      'total_price': 200,
-    },
-    {
-      'title': 'item 2',
-      'price': 2000,
-      'qty': 2,
-      'total_price': 4000,
-    },
-  ];
-
-  ScreenshotController screenshotController = ScreenshotController();
-  GlobalKey _containerKey = GlobalKey();
+  // // Example Data to test printer
+  // final List<Map<String, dynamic>> data = [
+  //   {
+  //     'title': 'item 1',
+  //     'price': 100,
+  //     'qty': 2,
+  //     'total_price': 200,
+  //   },
+  //   {
+  //     'title': 'item 2',
+  //     'price': 2000,
+  //     'qty': 2,
+  //     'total_price': 4000,
+  //   },
+  // ];
 
   @override
   void initState() {
@@ -65,18 +56,8 @@ class WebViewScreenState extends State<WebViewScreen> {
             padding: EdgeInsets.only(right: 20.0),
             child: ElevatedButton(
               onPressed: () async {
-                RenderRepaintBoundary renderRepaintBoundary =
-                    _containerKey.currentContext.findRenderObject();
-                ui.Image boxImage =
-                    await renderRepaintBoundary.toImage(pixelRatio: 1);
-                ByteData byteData =
-                    await boxImage.toByteData(format: ui.ImageByteFormat.png);
-                Uint8List uInt8List = byteData.buffer.asUint8List();
-
-                print(uInt8List);
-
                 Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => Print(data, uInt8List),
+                  builder: (context) => Print(_html),
                 ));
               },
               child: Icon(
@@ -87,14 +68,28 @@ class WebViewScreenState extends State<WebViewScreen> {
           ),
         ],
       ),
-      body: RepaintBoundary(
-        key: _containerKey,
-        child: WebView(
-          allowsInlineMediaPlayback: true,
-          initialUrl: widget.url,
-          javascriptMode: JavascriptMode.unrestricted,
-        ),
-      ),
+      body: Container(
+          child: WebView(
+        initialUrl: widget.url,
+        onWebViewCreated: (controller) {
+          _controller = controller;
+        },
+        javascriptMode: JavascriptMode.unrestricted,
+        gestureNavigationEnabled: true,
+        onPageFinished: (_) {
+          readJS();
+        },
+      )),
     );
+  }
+
+  void readJS() async {
+    String html = await _controller.evaluateJavascript(
+        "window.document.getElementsByTagName('html')[0].innerText;");
+
+    setState(() {
+      _html = html;
+    });
+    print(html);
   }
 }

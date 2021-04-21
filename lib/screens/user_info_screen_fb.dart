@@ -1,5 +1,4 @@
 import 'package:easacc_task/screens/webview_screen.dart';
-import 'package:easacc_task/widgets/bluetooth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:easacc_task/screens/sign_in_screen.dart';
@@ -53,7 +52,6 @@ class _UserInfoScreenFbState extends State<UserInfoScreenFb> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF2C384A),
       body: Center(
         child: SingleChildScrollView(
           child: SafeArea(
@@ -73,7 +71,6 @@ class _UserInfoScreenFbState extends State<UserInfoScreenFb> {
                   Text(
                     'Hello',
                     style: TextStyle(
-                      color: Colors.white70,
                       fontSize: 26,
                     ),
                   ),
@@ -81,7 +78,6 @@ class _UserInfoScreenFbState extends State<UserInfoScreenFb> {
                   Text(
                     widget.userData["name"],
                     style: TextStyle(
-                      color: Colors.white,
                       fontSize: 26,
                     ),
                   ),
@@ -132,8 +128,7 @@ class _UserInfoScreenFbState extends State<UserInfoScreenFb> {
                     children: <Widget>[
                       TextField(
                         controller: textController,
-                        style: TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.w300),
+                        style: TextStyle(fontWeight: FontWeight.w300),
                         decoration: const InputDecoration(
                           icon: Icon(Icons.link),
                           hintStyle: TextStyle(
@@ -142,18 +137,20 @@ class _UserInfoScreenFbState extends State<UserInfoScreenFb> {
                           helperText: "google.com",
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 16.0),
-                        child: ElevatedButton(
-                          child: Text("web view"),
-                          onPressed: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    WebViewScreen(url: textController.text),
-                              ),
-                            );
-                          },
+                      Center(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 16.0),
+                          child: ElevatedButton(
+                            child: Text("web view"),
+                            onPressed: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      WebViewScreen(url: textController.text),
+                                ),
+                              );
+                            },
+                          ),
                         ),
                       ),
                     ],

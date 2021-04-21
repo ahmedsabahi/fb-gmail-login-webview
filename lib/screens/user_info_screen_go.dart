@@ -1,6 +1,4 @@
 import 'package:easacc_task/screens/webview_screen.dart';
-import 'package:easacc_task/utils/printer.dart';
-import 'package:easacc_task/widgets/bluetooth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:easacc_task/screens/sign_in_screen.dart';
@@ -58,7 +56,6 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF2C384A),
       body: Center(
         child: SingleChildScrollView(
           child: SafeArea(
@@ -78,7 +75,6 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                   Text(
                     'Hello',
                     style: TextStyle(
-                      color: Colors.white70,
                       fontSize: 26,
                     ),
                   ),
@@ -86,11 +82,10 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                   Text(
                     _user.displayName,
                     style: TextStyle(
-                      color: Colors.white,
                       fontSize: 26,
                     ),
                   ),
-                  SizedBox(height: 30.0),
+                  SizedBox(height: 50.0),
                   _isSigningOut
                       ? CircularProgressIndicator(
                           valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
@@ -138,8 +133,7 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                     children: <Widget>[
                       TextField(
                         controller: textController,
-                        style: TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.w300),
+                        style: TextStyle(fontWeight: FontWeight.w300),
                         decoration: const InputDecoration(
                           icon: Icon(Icons.link),
                           hintStyle: TextStyle(
